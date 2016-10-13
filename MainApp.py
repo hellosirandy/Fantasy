@@ -1,32 +1,5 @@
-from DraftRecommander import DraftRecommander
-import sys
+from Draft import Recommender, UserInterface
 
-DR = DraftRecommander()
-DR.GetData()
-DR.GetPlayers()
-while True:
-    sys.stdout.write('Identity: (o or m) >> ')
-    identity = raw_input()
-    if  identity == 'o':         #others
-        sys.stdout.write("Player name or dump others stats (name or 'd'): >> ")
-        newDrafted = raw_input()
-        if newDrafted == 'd':
-            DR.DumpStats('others')
-        else:
-            try:
-                DR.PutDraftedPool(newDrafted, 'others')
-            except:
-                print 'No such player'
-    elif identity == 'm':       #me
-        DR.Recommand()
-        sys.stdout.write("Player name or dump others stats (name or 'd'): >> ")
-        newDrafted = raw_input()
-        if newDrafted == 'd':
-            DR.DumpStats('my')
-        else:
-            try:
-                DR.PutDraftedPool(newDrafted, 'me')
-            except:
-                print 'No such player'
-    else:
-        print "Invalid command"
+DR = Recommender()
+UI = UserInterface(DR)
+UI.Start()

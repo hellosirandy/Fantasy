@@ -1,9 +1,9 @@
 import requests
 import csv
 import operator
+import sys
 
-
-class DraftRecommander:
+class Recommender:
     def __init__(self):
         self.rawData = {}
         self.remainPool = {}
@@ -15,7 +15,6 @@ class DraftRecommander:
     def GetData(self):
         url = "http://stats.nba.com/leaders"
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36'}
-
         with requests.Session() as session:
             session.headers = headers
             session.get(url, headers=headers)
@@ -78,7 +77,7 @@ class DraftRecommander:
             self.myAverageStats['FG%'] = self.myAverageStats['FGM'] / self.myAverageStats['FGA']
             self.myAverageStats['FT%'] = self.myAverageStats['FTM'] / self.myAverageStats['FTA']
 
-    def Recommand(self):
+    def Recommend(self):
         rank = {}
         maxInfluence = -100
         losingItems = {}
@@ -104,8 +103,10 @@ class DraftRecommander:
                 recommandPlayer = rkey
         sortedRank = sorted(rank.items(), key = operator.itemgetter(1), reverse = True)
 
+        print '---------- Recommended List ----------'
         for i in range(0, 5):
             print sortedRank[i][0]
+        print '--------------------------------------'
 
     def DumpStats(self, identity):
         identityStats = []
@@ -113,6 +114,75 @@ class DraftRecommander:
             identityStats = self.othersAverageStats
         elif identity == 'my':
             identityStats = self.myAverageStats
-        print str(identity) + ' stats: '
+        print '---------- ' + str(identity) + ' stats ' + '----------'
         for key, value in identityStats.iteritems():
             print str(key) + '\t' + str(value).expandtabs(30)
+        print '-----------------------------------'
+
+class UserInterface:
+    def __init__(self, recommender):
+        self.recommender = recommender
+        self.recommender.GetData()
+        self.recommender.GetPlayers()
+        self.amount = 12
+        self.situation = {'now': 0, 'way': True}
+    def Start(self):
+        self.InputOrder()
+        self.Drafting()
+    def InputOrder(self):
+        order = -1
+        while not order > 0 or not order <= self.amount:
+            sys.stdout.write('Order: (enter a digit between 1 and ' + str(self.amount) + ') >> ')
+            try:
+                order = eval(raw_input())
+                self.order = order
+            except:
+                continue
+    def Drafting(self):
+        self.NextUp()
+        while True:
+            if  not self.situation['now'] == self.order:
+                sys.stdout.write("Number " + str(self.situation['now']) + ": >> ")
+                self.InputPlayer('others')
+            else:
+                self.recommender.Recommend()
+                sys.stdout.write("Your turn: >> ")
+                self.InputPlayer('my')
+
+    def NextUp(self):
+        if self.situation['way']:
+            if self.situation['now'] == self.amount:
+                self.situation['way'] = False
+            else:
+                self.situation['now'] += 1
+        else:
+            if self.situation['now'] == 1:
+                self.situation['way'] = True
+            else:
+                self.situation['now'] -= 1
+
+    def InputPlayer(self, identity):
+        name = raw_input()
+        if name[0] == '-':
+            self.InputCommand(name)
+        else:
+            try:
+                self.recommender.PutDraftedPool(name, identity)
+                if not self.situation['now'] == self.order:
+                    print 'Number ' + str(self.situation['now']) + ' has choosed ' + name + '.'
+                else:
+                    print 'You have choosed ' + name + '.'
+                self.NextUp()
+            except:
+                print 'No such player'
+
+    def InputCommand(self, command):
+        if command == '-h':
+            print ' -do: ' + '\t' + 'dump others stats'.expandtabs(30)
+            print ' -dm: ' + '\t' + 'dump my stats'.expandtabs(30)
+        elif command == '-do':
+            self.recommender.DumpStats('others')
+        elif command == '-dm':
+            self.recommender.DumpStats('my')
+
+
