@@ -52,7 +52,7 @@ class Recommender:
     def PutDraftedPool(self, playerName, identity):
         if identity == 'others':
             self.othersDraftedPool.append(playerName)
-        elif identity == 'me':
+        elif identity == 'my':
             self.myDraftedPool.append(playerName)
         self.UpdateAverage(playerName, identity)
         self.remainPool.pop(playerName, None)
@@ -67,7 +67,7 @@ class Recommender:
                     self.othersAverageStats[key] = (value * (draftedNum - 1) + self.remainPool[playerName][key]) / draftedNum
             self.othersAverageStats['FG%'] = self.othersAverageStats['FGM'] / self.othersAverageStats['FGA']
             self.othersAverageStats['FT%'] = self.othersAverageStats['FTM'] / self.othersAverageStats['FTA']
-        elif identity == 'me':
+        elif identity == 'my':
             draftedNum = len(self.myDraftedPool)
             for key, value in self.myAverageStats.iteritems():
                 if key == 'FGM' or key == 'FGA' or key == 'FTM' or key == 'FTA':
