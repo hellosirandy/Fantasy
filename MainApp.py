@@ -5,22 +5,28 @@ DR = DraftRecommander()
 DR.GetData()
 DR.GetPlayers()
 while True:
-    sys.stdout.write('Identity: (o or m) >> ')
-    identity = raw_input()
-    if  identity == 'o':         #others
-        try:
-            sys.stdout.write('Player name: >> ')
-            newDrafted = raw_input()
-            DR.PutDraftedPool(newDrafted, 'others')
-        except:
-            print 'No such player'
-    elif identity == 'm':       #me
+    sys.stdout.write('>> ')
+    command = raw_input()
+    if  command == 'o':         #others
+        sys.stdout.write("Player name or dump others stats (name or 'd'): >> ")
+        newDrafted = raw_input()
+        if newDrafted == 'd':
+            DR.DumpStats('others')
+        else:
+            try:
+                DR.PutDraftedPool(newDrafted, 'others')
+            except:
+                print 'No such player'
+    elif command == 'm':       #me
         DR.Recommand()
-        try:
-            sys.stdout.write('Player name: >> ')
-            newDrafted = raw_input()
-            DR.PutDraftedPool(newDrafted, 'me')
-        except:
-            print 'No such player'
+        sys.stdout.write("Player name or dump others stats (name or 'd'): >> ")
+        newDrafted = raw_input()
+        if newDrafted == 'd':
+            DR.DumpStats('my')
+        else:
+            try:
+                DR.PutDraftedPool(newDrafted, 'me')
+            except:
+                print 'No such player'
     else:
-        print "Please insert 'o' or 'm'"
+        print "Invalid command"

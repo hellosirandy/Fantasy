@@ -68,10 +68,8 @@ class DraftRecommander:
                     self.othersAverageStats[key] = (value * (draftedNum - 1) + self.remainPool[playerName][key]) / draftedNum
             self.othersAverageStats['FG%'] = self.othersAverageStats['FGM'] / self.othersAverageStats['FGA']
             self.othersAverageStats['FT%'] = self.othersAverageStats['FTM'] / self.othersAverageStats['FTA']
-            print 'others average: ' + str(self.othersAverageStats)
         elif identity == 'me':
             draftedNum = len(self.myDraftedPool)
-            print draftedNum
             for key, value in self.myAverageStats.iteritems():
                 if key == 'FGM' or key == 'FGA' or key == 'FTM' or key == 'FTA':
                     self.myAverageStats[key] = value + self.remainPool[playerName][key]
@@ -79,7 +77,6 @@ class DraftRecommander:
                     self.myAverageStats[key] = (value * (draftedNum - 1) + self.remainPool[playerName][key]) / draftedNum
             self.myAverageStats['FG%'] = self.myAverageStats['FGM'] / self.myAverageStats['FGA']
             self.myAverageStats['FT%'] = self.myAverageStats['FTM'] / self.myAverageStats['FTA']
-            print 'my average: ' + str(self.myAverageStats)
 
     def Recommand(self):
         rank = {}
@@ -109,5 +106,13 @@ class DraftRecommander:
 
         for i in range(0, 5):
             print sortedRank[i][0]
-        #print recommandPlayer
 
+    def DumpStats(self, identity):
+        identityStats = []
+        if identity == 'others':
+            identityStats = self.othersAverageStats
+        elif identity == 'my':
+            identityStats = self.myAverageStats
+        print str(identity) + ' stats: '
+        for key, value in identityStats.iteritems():
+            print str(key) + '\t' + str(value).expandtabs(30)
