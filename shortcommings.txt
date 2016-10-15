@@ -1,0 +1,2 @@
+1. Should concern winning items too.
+2. Delete from pool (when insert wrong player)
