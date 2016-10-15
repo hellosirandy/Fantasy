@@ -165,6 +165,9 @@ class UserInterface:
         name = raw_input()
         if name[0] == '-':
             self.InputCommand(name)
+        elif name == 'skip':
+            print 'Skipped'
+            self.NextUp()
         else:
             try:
                 self.recommender.PutDraftedPool(name, identity)
